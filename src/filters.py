@@ -6,6 +6,7 @@ and computation of horizontal and vertical image
 gradients using the Sobel operator.
 """
 import numpy as np
+from scipy.ndimage import correlate
 
 def zero_pad(image, pad_height, pad_width):
     """
@@ -53,6 +54,51 @@ def filter2d(image, kernel):
             out[h, w] = np.sum(window * kernel)
     return out
 
+def fast_filter2d(image, kernel):
+    """
+    Apply fast 2D cross-correlation to a grayscale image.
+
+    This function performs the same operation as the educational
+    ``filter2d`` implementation, but uses SciPy's optimized compiled
+    routines for significantly faster processing. The image is padded
+    with zeros at its boundaries, and the kernel is applied without
+    being flipped.
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        Two-dimensional grayscale input image.
+
+    kernel : numpy.ndarray
+        Two-dimensional filter kernel. Odd kernel dimensions are
+        recommended so that the kernel has a well-defined center.
+
+    Returns
+    -------
+    numpy.ndarray
+        Filtered image with the same dimensions as the input image.
+
+    Raises
+    ------
+    ValueError
+        If the image or kernel is not two-dimensional.
+    """
+    image = np.asarray(image)
+    kernel = np.asarray(kernel)
+
+    if image.ndim != 2:
+        raise ValueError("The input image must be a 2D grayscale array.")
+
+    if kernel.ndim != 2:
+        raise ValueError("The kernel must be a 2D array.")
+
+    return correlate(
+        image,
+        kernel,
+        mode="constant",
+        cval=0.0
+    )
+
 def partial_x(image):
     """
     Compute the horizontal image gradient using the Sobel operator.
@@ -72,7 +118,7 @@ def partial_x(image):
         [-2,  0,  2],
         [-1,  0,  1]
     ])
-    return filter2d(image, sobel_x)
+    return fast_filter2d(image, sobel_x)
 
 def partial_y(image):
     """
@@ -93,6 +139,6 @@ def partial_y(image):
         [ 0,  0,  0],
         [ 1,  2,  1]
     ])
-    return filter2d(image, sobel_y)
+    return fast_filter2d(image, sobel_y)
 
 

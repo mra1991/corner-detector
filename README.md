@@ -42,7 +42,7 @@ corner-detector/
 Install the required libraries:
 
 ```bash
-pip install numpy matplotlib scikit-image pillow
+pip install numpy matplotlib scikit-image pillow scipy
 ```
 
 ## How to Run

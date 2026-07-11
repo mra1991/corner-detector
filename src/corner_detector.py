@@ -7,7 +7,7 @@ Harris response, thresholding weak responses, and applying non-maximum
 suppression to identify corner locations.
 """
 import numpy as np
-from filters import filter2d, partial_x, partial_y
+from filters import filter2d, fast_filter2d, partial_x, partial_y
 from skimage.feature import peak_local_max
 
 def harris_corners(img, window_size=3, k=0.04):
@@ -51,9 +51,9 @@ def harris_corners(img, window_size=3, k=0.04):
 
     # step 3: compute second moment matrix in a window around each pixel 
     window = np.ones((window_size, window_size))
-    Sxx = filter2d(Ixx, window)
-    Syy = filter2d(Iyy, window)
-    Sxy = filter2d(Ixy, window)
+    Sxx = fast_filter2d(Ixx, window)
+    Syy = fast_filter2d(Iyy, window)
+    Sxy = fast_filter2d(Ixy, window)
 
     # step 4: compute Harris response:
     # R = det(M) - k * (trace(M))^2
